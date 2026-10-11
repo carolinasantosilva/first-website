@@ -1,24 +1,198 @@
 <!DOCTYPE html>
-<html>
-    <body>
-        <header>
-            <h1>My website</h1>
-            <nav>
-                <a href="/">Home</a> |
-                <a href="/about">About</a> |
-                <a href="/contact">Contact</a> 
-            </nav>
-        </header>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
 
-        <main>
-            <section>
-                <h2>Welcome!</h2>
-                <p>This is the main content area.</p>
-            </section>
-        </main>
+    <!-- Basic styling -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            color: #333;
+            background-color: #f8f9fa;
+        }
 
-        <footer>
-            <p>&copy; 2026 My Website</p>
-        </footer>
-    </body>
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        #chart {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        #chart svg {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .bar {
+            fill: steelblue;
+        }
+
+        .bar:hover {
+            fill: orange;
+        }
+
+        .axis text {
+            font-size: 13px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>My website</h1>
+        <nav>
+            <a href="./">Home</a> |
+            <a href="./about.html">About</a> |
+            <a href="./contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Welcome!</h2>
+            <p>This is the main content area.</p>
+        </section>
+
+        <!-- D3.js bar chart -->
+        <section>
+            <h2>My First Bar Chart</h2>
+            <p>This chart displays four values using D3.js.</p>
+            <div id="chart"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 My Website</p>
+    </footer>
+
+    <!-- Load D3.js version 7 from a CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+
+    <script>
+        // Your data
+        const data = [
+            { name: "A", value: 1 },
+            { name: "B", value: 5 },
+            { name: "C", value: 8 },
+            { name: "D", value: 10 }
+        ];
+
+        // Chart dimensions
+        const width = 700;
+        const height = 350;
+
+        const margin = {
+            top: 30,
+            right: 30,
+            bottom: 50,
+            left: 50
+        };
+
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        // Create the SVG drawing area
+        const svg = d3.select("#chart")
+            .append("svg")
+            .attr("viewBox", `0 0 ${width} ${height}`)
+            .attr("role", "img")
+            .attr("aria-label", "Bar chart showing values A: 1, B: 5, C: 8, D: 10");
+
+        const chart = svg.append("g")
+            .attr("transform",
+                `translate(${margin.left},${margin.top})`);
+
+        // X scale: positions of the bars
+        const x = d3.scaleBand()
+            .domain(data.map(d => d.name))
+            .range([0, innerWidth])
+            .padding(0.25);
+
+        // Y scale: bar heights
+        const y = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.value)])
+            .nice()
+            .range([innerHeight, 0]);
+
+        // Draw the bars
+        chart.selectAll(".bar")
+            .data(data)
+            .join("rect")
+            .attr("class", "bar")
+            .attr("x", d => x(d.name))
+            .attr("y", d => y(d.value))
+            .attr("width", x.bandwidth())
+            .attr("height", d => innerHeight - y(d.value));
+
+        // Add value labels above each bar
+        chart.selectAll(".value-label")
+            .data(data)
+            .join("text")
+            .attr("class", "value-label")
+            .attr("x", d => x(d.name) + x.bandwidth() / 2)
+            .attr("y", d => y(d.value) - 8)
+            .attr("text-anchor", "middle")
+            .text(d => d.value);
+
+        // Add the X axis
+        chart.append("g")
+            .attr("class", "axis")
+            .attr("transform", `translate(0,${innerHeight})`)
+            .call(d3.axisBottom(x));
+
+        // Add the Y axis
+        chart.append("g")
+            .attr("class", "axis")
+            .call(d3.axisLeft(y).ticks(5));
+
+        // Label the axes
+        chart.append("text")
+            .attr("x", innerWidth / 2)
+            .attr("y", innerHeight + 40)
+            .attr("text-anchor", "middle")
+            .text("Category");
+
+        chart.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -innerHeight / 2)
+            .attr("y", -38)
+            .attr("text-anchor", "middle")
+            .text("Value");
+    </script>
+</body>
 </html>
+```
